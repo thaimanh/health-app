@@ -1,0 +1,11 @@
+{
+  "logLevel": "info",
+  "port": 80,
+  "rateLimit": {
+    "maxRequests": 500,
+    "windowMs": 300000
+  },
+  "jwt": {
+    "expiresIn": "15m"
+  }
+}
