@@ -30,12 +30,9 @@ export class UserController {
     Paginated.sendPaginated(res, result.users, result.total, filters.page, filters.limit, message);
   });
 
-  /**
-   * Get user by ID
-   * GET /users/:id
-   */
   public getUserById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+
     const user = await userService.getUserById(id);
 
     const message = 'Get user successfully';

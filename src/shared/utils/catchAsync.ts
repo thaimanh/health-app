@@ -1,8 +1,7 @@
 // utils/asyncHandler.ts
 import { Request, Response, NextFunction } from 'express';
-import { createLogger } from '../../shared/logger';
-
-const logger = createLogger({ module: 'AsyncHandler' });
+import { logger } from '../../shared/logger';
+import { Prisma } from '@prisma/client';
 
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -10,22 +9,11 @@ export const asyncHandler = (fn: Function) => {
 
     Promise.resolve(fn(req, res, next))
       .then(() => {
-        const duration = Date.now() - startTime;
-        logger.debug(`Request completed`, {
-          method: req.method,
-          url: req.url,
-          statusCode: res.statusCode,
-          duration: `${duration}ms`,
-        });
+        logger.info(
+          `${req.method} ${req.originalUrl} ${res.statusCode} - ${Date.now() - startTime}ms`,
+        );
       })
       .catch((error) => {
-        const duration = Date.now() - startTime;
-        logger.error(`Request failed`, {
-          method: req.method,
-          url: req.url,
-          error: error.message,
-          duration: `${duration}ms`,
-        });
         next(error);
       });
   };

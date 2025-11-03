@@ -1,25 +1,20 @@
-import { Request, Response, NextFunction, json, urlencoded } from 'express';
+import { Request, Response, NextFunction, json, urlencoded, Express } from 'express';
 import helmet from 'helmet';
-import nocache from 'nocache';
 import cors from 'cors';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { logger } from '../shared/logger';
 import config from '../config';
-import app from '../app';
 
-export const securityMiddleware = () => {
+export const securityMiddleware = (app: Express) => {
   // Helmet helps secure Express apps by setting various HTTP headers
   app.use(helmet());
-
-  // Prevent caching on the client-side
-  app.use(nocache);
 
   // Limit API requests to prevent brute-force and DDoS attacks
   const apiLimiter = rateLimit({
     max: config.get('rateLimit.maxRequests'),
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    standardHeaders: true,
+    legacyHeaders: false,
     message: 'Too many requests from this IP, please try again after some time.',
     handler: (req: Request, res: Response, _next: NextFunction) => {
       logger.warn(`Rate limit exceeded for IP: ${req.ip}`);

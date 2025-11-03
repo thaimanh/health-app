@@ -17,37 +17,10 @@ class PrismaService {
       }
       this.prisma = globalThis.prisma;
     }
-
-    this.setupPrismaLogging();
   }
 
   private createPrismaClient(): PrismaClient {
-    return new PrismaClient({
-      log: [
-        { level: 'warn', emit: 'event' },
-        { level: 'error', emit: 'event' },
-        { level: 'info', emit: 'event' },
-        { level: 'query', emit: 'event' },
-      ],
-    });
-  }
-
-  /**
-   * Setup log for Prisma Client
-   */
-  private setupPrismaLogging(): void {
-    (this.prisma as any).$on('warn', (e: any) =>
-      logger.warn('Prisma WARN: ' + JSON.stringify(e), e),
-    );
-    (this.prisma as any).$on('error', (e: any) =>
-      logger.error('Prisma ERROR: ' + JSON.stringify(e), e),
-    );
-    (this.prisma as any).$on('info', (e: any) =>
-      logger.info('Prisma INFO: ' + JSON.stringify(e), e),
-    );
-    (this.prisma as any).$on('query', (e: any) =>
-      logger.debug('Prisma QUERY: ' + JSON.stringify(e.query), e.params),
-    );
+    return new PrismaClient();
   }
 
   /**

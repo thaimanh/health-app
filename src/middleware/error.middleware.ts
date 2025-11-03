@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { BaseError } from '../shared/errors/base.error';
 import { logger } from '../shared/logger';
 import { StatusCodes } from 'http-status-codes';
+import { Prisma } from '@prisma/client';
 
 // Centralized error handling middleware for Express
 export const errorHandlerMiddleware = (
@@ -24,15 +25,30 @@ export const errorHandlerMiddleware = (
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     });
   } else if (err.name === 'ValidationError') {
-    logger.warn(`Validation Error: ${err.message}`, { error: err });
+    logger.warn({ error: err }, `Validation Error: ${err.message}`);
     return res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
       message: err.message,
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     });
+  } else if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    logger.error(
+      {
+        code: err.code,
+        message: err.meta?.message,
+      },
+      'Prisma Error:',
+    );
+
+    // Return generic error to client
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid request data',
+      ...(process.env.NODE_ENV === 'development' && { stack: err.meta?.message }),
+    });
   }
 
-  logger.error(`Server Error: ${err.name} - ${err.message}`, { error: err });
+  logger.error({ error: err }, `Server Error: ${err.name} - ${err.message}`);
 
   return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,

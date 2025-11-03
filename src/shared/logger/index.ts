@@ -1,9 +1,7 @@
 import pino from 'pino';
-import pinoHttp from 'pino-http';
 import config from '../../config';
 
 const nodeEnv = config.get('env');
-const logLevel = config.get('logLevel');
 
 const fileTransport = pino.transport({
   targets: [
@@ -13,7 +11,7 @@ const fileTransport = pino.transport({
         destination: './logs/app.log',
         mkdir: true,
       },
-      level: 'info',
+      level: 'debug',
     },
     {
       target: 'pino/file',
@@ -30,7 +28,8 @@ const fileTransport = pino.transport({
             target: 'pino-pretty',
             options: {
               colorize: true,
-              ignore: 'pid,hostname',
+              level: 'debug', // Allow debug level in pretty output
+              ignore: 'pid,hostname,req,res',
               translateTime: 'SYS:dd-mm-yyyy HH:MM:ss',
             },
           },
@@ -47,14 +46,8 @@ export type Logger = pino.Logger;
 
 export const logger: Logger = pino(
   {
-    level: logLevel || 'info',
+    level: 'debug',
     timestamp: () => `,"time":"${new Date().toLocaleString()}"`,
   },
   fileTransport,
 );
-
-// HTTP logger
-export const httpLogger = pinoHttp({
-  logger: logger as any,
-  autoLogging: true,
-});
