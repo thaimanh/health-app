@@ -39,7 +39,13 @@ const fileTransport = pino.transport({
   ],
 });
 
-export const logger = pino(
+export const createLogger = (context: Record<string, any>) => {
+  return logger.child(context);
+};
+
+export type Logger = pino.Logger;
+
+export const logger: Logger = pino(
   {
     level: logLevel || 'info',
     timestamp: () => `,"time":"${new Date().toLocaleString()}"`,

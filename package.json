@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-best-practices-server",
+  "name": "health-app",
   "version": "1.0.0",
   "description": "Node.js (Express, TypeScript, Prisma, MongoDB) server following best practices.",
   "main": "dist/server.js",
@@ -12,10 +12,15 @@
     "lint": "eslint \"{src,tests}/**/*.ts\"",
     "lint:fix": "eslint \"{src,tests}/**/*.ts\" --fix",
     "format": "prettier --write \"{src,tests}/**/*.ts\"",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate:dev": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset && npm run db:seed",
+    "db:studio": "prisma studio",
     "prebuild": "npm run lint && npm run test"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
