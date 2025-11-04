@@ -1,80 +1,124 @@
-// controllers/user.controller.ts
-import { Request, Response } from 'express';
-import { OK, CREATED, Paginated } from '../../../shared/utils/apiResponse';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  QueryParam,
+  Authorized,
+  CurrentUser,
+  HttpCode,
+  OnUndefined,
+} from 'routing-controllers';
+import { OpenAPI } from 'routing-controllers-openapi';
 import userService from './user.service';
-import { asyncHandler } from '../../../shared/utils/catchAsync';
+import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { User } from '@prisma/client';
+import { CREATED, OK, Paginated } from '../../../shared/utils/apiResponse';
 
+@Controller('/user')
+@OpenAPI({ security: [{ bearerAuth: [] }] })
 export class UserController {
-  constructor() {}
-
-  public createUser = asyncHandler(async (req: Request, res: Response) => {
-    const userData = req.body;
+  @Post()
+  @HttpCode(201)
+  @OpenAPI({
+    summary: 'Create a new user',
+    description: 'Creates a new user with the provided data',
+  })
+  async createUser(@Body() userData: CreateUserDto) {
     const newUser = await userService.createUser(userData);
+    CREATED.sendCreated('Create user successfully', newUser);
+  }
 
-    const message = 'Create user successfully';
-    CREATED.sendCreated(res, message, newUser);
-  });
-
-  public getUsers = asyncHandler(async (req: Request, res: Response) => {
+  @Get()
+  @OpenAPI({
+    summary: 'Get all users',
+    description: 'Retrieves a paginated list of users with optional filtering',
+  })
+  async getUsers(
+    @QueryParam('page') page: number = 1,
+    @QueryParam('limit') limit: number = 10,
+    @QueryParam('search') search?: string,
+    @QueryParam('role') role?: string,
+  ) {
     const filters = {
-      page: parseInt(req.query.page as string) || 1,
-      limit: parseInt(req.query.limit as string) || 10,
-      search: req.query.search as string,
-      role: req.query.role as string,
+      page: Math.max(1, page),
+      limit: Math.min(100, limit),
+      search,
+      role,
     };
 
     const result = await userService.getUsers(filters);
 
-    const message = `Get users successfully. Found ${result.total} items.`;
+    Paginated.sendPaginated(
+      result.users,
+      result.total,
+      filters.page,
+      filters.limit,
+      'Get list user successfully',
+    );
+  }
 
-    Paginated.sendPaginated(res, result.users, result.total, filters.page, filters.limit, message);
-  });
-
-  public getUserById = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-
+  @Get('/:id')
+  @OpenAPI({
+    summary: 'Get user by ID',
+    description: 'Retrieves a specific user by their ID',
+  })
+  async getUserById(@Param('id') id: string) {
     const user = await userService.getUserById(id);
+    OK.sendOK('Get detail user successfully', user);
+  }
 
-    const message = 'Get user successfully';
-    OK.sendOK(res, message, user);
-  });
-
-  public updateUser = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const updateData = req.body;
-
+  @Put('/:id')
+  @OpenAPI({
+    summary: 'Update user',
+    description: 'Updates a specific user by their ID',
+  })
+  async updateUser(@Param('id') id: string, @Body() updateData: UpdateUserDto) {
     const updatedUser = await userService.updateUser(id, updateData);
+    OK.sendOK('Update user successfully', updatedUser);
+  }
 
-    const message = 'Update user successfully';
-    OK.sendOK(res, message, updatedUser);
-  });
-
-  public deleteUser = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+  @Delete('/:id')
+  @HttpCode(204)
+  @OnUndefined(204)
+  @OpenAPI({
+    summary: 'Delete user',
+    description: 'Deletes a specific user by their ID',
+  })
+  async deleteUser(@Param('id') id: string): Promise<void> {
     await userService.deleteUser(id);
+  }
 
-    const message = 'Delete user successfully';
-    OK.sendOK(res, message);
-  });
+  @Get('/me/profile')
+  @Authorized()
+  @OpenAPI({
+    summary: 'Get current user profile',
+    description: 'Retrieves the profile of the currently authenticated user',
+  })
+  async getCurrentUser(@CurrentUser() user: User) {
+    const userProfile = await userService.getUserById(user.id);
+    return {
+      success: true,
+      message: 'Get user profile successfully',
+      data: userProfile,
+    };
+  }
 
-  public getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
-    const userId = (req as any).user.id;
-    const user = await userService.getUserById(userId);
-
-    const message = 'Get user profile successfully';
-    OK.sendOK(res, message, user);
-  });
-
-  public updateCurrentUser = asyncHandler(async (req: Request, res: Response) => {
-    const userId = (req as any).user.id;
-    const updateData = req.body;
-
-    const updatedUser = await userService.updateUser(userId, updateData);
-
-    const message = 'Update user profile successfully';
-    OK.sendOK(res, message, updatedUser);
-  });
+  @Put('/me/profile')
+  @Authorized()
+  @OpenAPI({
+    summary: 'Update current user profile',
+    description: 'Updates the profile of the currently authenticated user',
+  })
+  async updateCurrentUser(@CurrentUser() user: User, @Body() updateData: UpdateUserDto) {
+    const updatedUser = await userService.updateUser(user.id, updateData);
+    return {
+      success: true,
+      message: 'Update user profile successfully',
+      data: updatedUser,
+    };
+  }
 }
-
-const userController = new UserController();
-export default userController;

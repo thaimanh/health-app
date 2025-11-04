@@ -2,13 +2,11 @@ import { Prisma, UserRole } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import prismaService from '../../../shared/prisma';
 import {
-  IUpdateUser,
-  IUserFilters,
-  ICreateUser,
   detailUserSelect,
   listUserSelect,
-  IResponseDetailUser,
-  IPaginationResponseListUser,
+  CreateUserDto,
+  UserQueryParams,
+  UpdateUserDto,
 } from './user.dto';
 import { ConflictError, InternalServerError, NotFoundError } from '../../../shared/errors';
 import { createLogger, Logger } from '../../../shared/logger';
@@ -24,7 +22,7 @@ export class UserService {
     this.userRepository = prismaService.prisma.user;
   }
 
-  async createUser(userData: ICreateUser): Promise<IResponseDetailUser> {
+  async createUser(userData: CreateUserDto) {
     try {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
 
@@ -56,7 +54,7 @@ export class UserService {
     }
   }
 
-  async getUsers(filters: IUserFilters = {}): Promise<IPaginationResponseListUser> {
+  async getUsers(filters: UserQueryParams) {
     const page = Math.max(1, filters.page || 1);
     const limit = Math.min(100, Math.max(1, filters.limit || 10));
     const skip = (page - 1) * limit;
@@ -92,7 +90,7 @@ export class UserService {
     };
   }
 
-  async getUserById(id: string): Promise<IResponseDetailUser> {
+  async getUserById(id: string) {
     const user = await this.userRepository.findUnique({
       where: { id },
       select: detailUserSelect,
@@ -105,7 +103,7 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, updateData: IUpdateUser): Promise<IResponseDetailUser> {
+  async updateUser(id: string, updateData: UpdateUserDto) {
     try {
       const existingUser = await this.userRepository.findUnique({
         where: { id },

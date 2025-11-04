@@ -6,7 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { logger } from '../shared/logger';
 import config from '../config';
 
-export const securityMiddleware = (app: Express) => {
+export const SecurityMiddleware = (app: Express) => {
   // Helmet helps secure Express apps by setting various HTTP headers
   app.use(helmet());
 

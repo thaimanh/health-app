@@ -35,16 +35,16 @@ class SuccessResponse<T = object> {
     this.pagination = pagination;
   }
 
-  send(res: any): any {
-    return res.status(this.status).json(this);
+  send(): any {
+    return this;
   }
 
-  static sendOK<M>(res: any, message?: string, metadata?: M, pagination?: PaginationMetadata): any {
-    return new OK<M>({ message, metadata, pagination }).send(res);
+  static sendOK<M>(message?: string, metadata?: M, pagination?: PaginationMetadata): any {
+    return new OK<M>({ message, metadata, pagination }).send();
   }
 
-  static sendCreated<M>(res: any, message?: string, metadata?: M): any {
-    return new CREATED<M>({ message, metadata }).send(res);
+  static sendCreated<M>(message?: string, metadata?: M): any {
+    return new CREATED<M>({ message, metadata }).send();
   }
 
   /**
@@ -58,7 +58,6 @@ class SuccessResponse<T = object> {
    * @returns The response object after sending.
    */
   static sendPaginated<M>(
-    res: any,
     data: M[],
     totalItems: number,
     currentPage: number,
@@ -71,7 +70,7 @@ class SuccessResponse<T = object> {
       totalItems,
       currentPage,
       itemsPerPage,
-    }).send(res);
+    }).send();
   }
 }
 

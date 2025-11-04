@@ -1,9 +1,12 @@
+/* eslint-disable */
+
+import bcrypt from 'bcrypt';
 import { PrismaClient, UserRole } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.deleteMany({}); // Clear existing data
+  const passwordHashed = await bcrypt.hash('123456', 10);
 
   const users = [
     {
@@ -12,8 +15,10 @@ async function main() {
       lastName: 'Doe',
       role: UserRole.USER,
       email: 'john.doe@example.com',
-      password: 'hashedpassword1', // In a real app, use a proper hashing library
+      password: passwordHashed,
       phone: '123-456-7890',
+      isVerified: true,
+      emailVerificationToken: null,
     },
     {
       userName: 'jane.smith',
@@ -21,8 +26,10 @@ async function main() {
       lastName: 'Smith',
       role: UserRole.ADMIN,
       email: 'jane.smith@example.com',
-      password: 'hashedpassword2',
+      password: passwordHashed,
       phone: '987-654-3210',
+      isVerified: true,
+      emailVerificationToken: null,
     },
     {
       userName: 'peter.jones',
@@ -30,41 +37,24 @@ async function main() {
       lastName: 'Jones',
       role: UserRole.USER,
       email: 'peter.jones@example.com',
-      password: 'hashedpassword3',
-      phone: null, // Example with optional field not provided
-    },
-    {
-      userName: 'alice.williams',
-      firstName: 'Alice',
-      lastName: 'Williams',
-      role: UserRole.USER,
-      email: 'alice.williams@example.com',
-      password: 'hashedpassword4',
-      phone: '555-123-4567',
-    },
-    {
-      userName: 'bob.brown',
-      firstName: 'Bob',
-      lastName: 'Brown',
-      role: UserRole.USER,
-      email: 'bob.brown@example.com',
-      password: 'hashedpassword5',
-      phone: '111-222-3333',
+      password: passwordHashed,
+      phone: null,
+      isVerified: true,
+      emailVerificationToken: null,
     },
   ];
 
-  for (const user of users) {
-    await prisma.user.create({
-      data: user,
-    });
-  }
+  // Use createMany for better performance
+  await prisma.user.createMany({
+    data: users,
+  });
 
   console.log('Seed data for User model has been created.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seeding error:', e);
     process.exit(1);
   })
   .finally(async () => {
