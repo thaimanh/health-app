@@ -20,6 +20,6 @@
       "@middlewares/*": ["middlewares/*"]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "prisma/seed.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "prisma/seed.ts", "src/api/v1/body-measurement/bodyMeasurement.controller.ts"],
   "exclude": ["node_modules"]
 }

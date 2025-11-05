@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -5,6 +8,60 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+// User Role Enum
+enum UserRole {
+  ADMIN
+  USER
+}
+
+// Article Category Enum
+enum ArticleCategory {
+  RECOMMENDED
+  DIET
+  BEAUTY
+  HEALTH
+}
+
+// Meal Type Enum
+enum MealType {
+  MORNING
+  LUNCH
+  DINNER
+  SNACK
+}
+
+// Goal Status Enum
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Goal Category Enum
+enum GoalCategory {
+  FITNESS
+  LEARNING
+  WORK
+  PERSONAL
+  OTHER
+}
+
+// Exercise Type Enum
+enum ExerciseType {
+  RUNNING
+  WEIGHTLIFTING
+  YOGA
+  SWIMMING
+  CYCLING
+  OTHER
+}
+
+type RecentBodyMeasurement {
+  id                Int
+  date              DateTime
+  weightKg          Float    @map("weight_kg")
+  bodyFatPercentage Float    @map("body_fat_percentage")
 }
 
 model User {
@@ -19,11 +76,126 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
+  recentDayBodyMeasurements RecentBodyMeasurement[] @map("recent_day_body_measurements")
+
+  meal            Meal[]
+  bodyMeasurement BodyMeasurement[]
+  exerciseRecord  ExerciseRecord[]
+  diary           Diary[]
+  goal            Goal[]
+
   @@index([createdAt])
   @@map("users")
 }
 
-enum UserRole {
-  ADMIN
-  USER
+model Meal {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @map("user_id") @db.ObjectId
+  mealType      MealType @map("meal_type")
+  mealDate      DateTime @map("meal_date")
+  imageUrl      String?  @map("image_url")
+  description   String?
+  calories      Int?
+  protein       Float?
+  carbohydrates Float?
+  fats          Float?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([mealDate])
+  @@map("meals")
+}
+
+model BodyMeasurement {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @map("user_id") @db.ObjectId
+  measurementDate   DateTime @map("measurement_date")
+  weightKg          Float    @map("weight_kg")
+  bodyFatPercentage Float    @map("body_fat_percentage")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, measurementDate])
+  @@map("body_measurements")
+}
+
+model ExerciseRecord {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @map("user_id") @db.ObjectId
+  exerciseDate    DateTime      @map("exercise_date")
+  exerciseType    ExerciseType? @map("exercise_type")
+  durationMinutes Int?          @map("duration_minutes")
+  caloriesBurned  Int?          @map("calories_burned")
+  description     String?
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("exercise_records")
+}
+
+model Diary {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @map("user_id") @db.ObjectId
+  entryDate DateTime @map("entry_date")
+  title     String?
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entryDate])
+  @@map("diaries")
+}
+
+model Article {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  category    ArticleCategory?
+  publishDate DateTime         @map("publish_date")
+  imageUrl    String?          @map("image_url")
+  content     String
+  author      String?
+  viewsCount  Int              @default(0) @map("views_count")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@map("articles")
+}
+
+model Goal {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @map("user_id") @db.ObjectId
+  title       String
+  description String?
+  goalDate    DateTime @map("goal_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  progress    Int      @default(0)
+
+  user     User       @relation(fields: [userId], references: [id])
+  goalItem GoalItem[]
+
+  @@index([userId, goalDate])
+  @@map("goals")
+}
+
+model GoalItem {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  goalId          String       @map("goal_id") @db.ObjectId
+  category        GoalCategory
+  itemDescription String       @map("item_description")
+  isCompleted     Boolean      @default(false) @map("is_completed")
+  completedAt     DateTime?    @map("completed_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  goal Goal @relation(fields: [goalId], references: [id])
+
+  @@index([goalId])
+  @@map("goal_items")
 }

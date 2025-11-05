@@ -1,0 +1,711 @@
+{
+  "info": {
+    "name": "Article API Collection",
+    "description": "Complete testing for Article CRUD endpoints (Admin only)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "articleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "technologyArticleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "healthArticleId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Setup - Get Admin Token",
+      "item": [
+        {
+          "name": "Login as Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Create Articles",
+      "item": [
+        {
+          "name": "Create Technology Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Future of Artificial Intelligence in 2024\",\n  \"category\": \"TECHNOLOGY\",\n  \"publishDate\": \"2024-01-15T10:00:00.000Z\",\n  \"imageUrl\": \"https://example.com/images/ai-future.jpg\",\n  \"content\": \"Artificial Intelligence continues to evolve at an unprecedented pace. In 2024, we're seeing breakthroughs in natural language processing, computer vision, and autonomous systems. This article explores the latest trends and what to expect in the coming year.\",\n  \"author\": \"Tech Expert\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "Create Health Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mental Health Benefits of Regular Exercise\",\n  \"category\": \"HEALTH\",\n  \"publishDate\": \"2024-01-16T09:30:00.000Z\",\n  \"imageUrl\": \"https://example.com/images/mental-health-exercise.jpg\",\n  \"content\": \"Regular physical activity has been proven to significantly improve mental health. Studies show that exercise can reduce symptoms of depression and anxiety, improve sleep quality, and boost overall mood. This article examines the scientific evidence behind these benefits.\",\n  \"author\": \"Dr. Sarah Johnson\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "Create Business Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Remote Work Trends in Post-Pandemic Era\",\n  \"category\": \"BUSINESS\",\n  \"publishDate\": \"2024-01-17T14:20:00.000Z\",\n  \"imageUrl\": \"https://example.com/images/remote-work.jpg\",\n  \"content\": \"The pandemic permanently changed how we work. Companies are now adopting hybrid models, investing in digital collaboration tools, and rethinking office spaces. This article analyzes the long-term impacts of remote work on productivity and company culture.\",\n  \"author\": \"Business Analyst\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "Create Article Without Optional Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Minimal Article Example\",\n  \"category\": \"SCIENCE\",\n  \"publishDate\": \"2024-01-18T08:00:00.000Z\",\n  \"content\": \"This is a minimal article example without optional fields like image URL and author to test the API's handling of null values and default behaviors.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📖 Read Operations",
+      "item": [
+        {
+          "name": "Get All Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Articles by Title",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article?search=Artificial&page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "Artificial"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter by Technology Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article?category=TECHNOLOGY&page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "TECHNOLOGY"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter by Health Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article?category=HEALTH&page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "HEALTH"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Article by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{articleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Pagination Test - Page 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article?page=2&limit=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "✏️ Update Operations",
+      "item": [
+        {
+          "name": "Update Article Title and Content",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: The Future of AI and Machine Learning in 2024\",\n  \"content\": \"This article has been updated with the latest research and developments in AI and machine learning for 2024. We now include information about quantum computing integration and ethical AI considerations.\",\n  \"viewsCount\": 250\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article/{{technologyArticleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{technologyArticleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Article Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"SCIENCE\",\n  \"imageUrl\": \"https://example.com/images/science-health.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article/{{healthArticleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{healthArticleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Partial Update - Only Views Count",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"viewsCount\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article/{{articleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{articleId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🗑️ Delete Operations",
+      "item": [
+        {
+          "name": "Delete Technology Article",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article/{{technologyArticleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{technologyArticleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Health Article",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article/{{healthArticleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "{{healthArticleId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚨 Error Scenarios & Validation",
+      "item": [
+        {
+          "name": "❌ Create Article - No Authentication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Article Without Auth\",\n  \"category\": \"TECHNOLOGY\",\n  \"publishDate\": \"2024-01-15T10:00:00.000Z\",\n  \"content\": \"This should fail due to missing authentication\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "❌ Create Article - Invalid Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Article\",\n  \"category\": \"INVALID_CATEGORY\",\n  \"publishDate\": \"2024-01-15T10:00:00.000Z\",\n  \"content\": \"This should fail due to invalid category\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "❌ Create Article - Missing Required Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incomplete Article\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "❌ Create Article - Title Too Short",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Hi\",\n  \"category\": \"TECHNOLOGY\",\n  \"publishDate\": \"2024-01-15T10:00:00.000Z\",\n  \"content\": \"Valid content but title is too short\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "❌ Create Article - Content Too Short",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Valid Title Here\",\n  \"category\": \"TECHNOLOGY\",\n  \"publishDate\": \"2024-01-15T10:00:00.000Z\",\n  \"content\": \"Short\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article",
+              "host": ["{{baseUrl}}"],
+              "path": ["article"]
+            }
+          }
+        },
+        {
+          "name": "❌ Get Article - Non-existent ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article/507f1f77bcf86cd799439011",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "507f1f77bcf86cd799439011"]
+            }
+          }
+        },
+        {
+          "name": "❌ Update Article - Non-existent ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/article/507f1f77bcf86cd799439012",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "507f1f77bcf86cd799439012"]
+            }
+          }
+        },
+        {
+          "name": "❌ Delete Article - Non-existent ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/article/507f1f77bcf86cd799439013",
+              "host": ["{{baseUrl}}"],
+              "path": ["article", "507f1f77bcf86cd799439013"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set admin token after login",
+          "if (pm.response.code === 200 && pm.request.url.path.includes('auth/login')) {",
+          "    const responseData = pm.response.json();",
+          "    if (responseData.data && responseData.data.token) {",
+          "        pm.collectionVariables.set(\"adminToken\", responseData.data.token);",
+          "        console.log(\"✅ Admin token set:\", responseData.data.token);",
+          "    }",
+          "}",
+          "",
+          "// Set article IDs after creation",
+          "if (pm.response.code === 201 && pm.request.url.path.includes('article') && pm.request.method === 'POST') {",
+          "    const responseData = pm.response.json();",
+          "    if (responseData.data && responseData.data.id) {",
+          "        const articleTitle = JSON.parse(pm.request.body.raw).title;",
+          "        ",
+          "        if (articleTitle.includes('Artificial Intelligence')) {",
+          "            pm.collectionVariables.set(\"technologyArticleId\", responseData.data.id);",
+          "            console.log(\"✅ Technology article ID set:\", responseData.data.id);",
+          "        } else if (articleTitle.includes('Mental Health')) {",
+          "            pm.collectionVariables.set(\"healthArticleId\", responseData.data.id);",
+          "            console.log(\"✅ Health article ID set:\", responseData.data.id);",
+          "        } else {",
+          "            pm.collectionVariables.set(\"articleId\", responseData.data.id);",
+          "            console.log(\"✅ Default article ID set:\", responseData.data.id);",
+          "        }",
+          "    }",
+          "}",
+          "",
+          "// Test response structure for successful requests",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    const responseData = pm.response.json();",
+          "    ",
+          "    // Test for standard response structure",
+          "    pm.test(\"Response has success structure\", function () {",
+          "        pm.expect(responseData).to.have.property('data');",
+          "        pm.expect(responseData).to.have.property('message');",
+          "    });",
+          "    ",
+          "    // Test for camelCase properties in article data",
+          "    if (responseData.data && Array.isArray(responseData.data)) {",
+          "        pm.test(\"Articles use camelCase properties\", function () {",
+          "            const article = responseData.data[0];",
+          "            if (article) {",
+          "                pm.expect(article).to.have.property('publishDate');",
+          "                pm.expect(article).to.have.property('imageUrl');",
+          "                pm.expect(article).to.have.property('viewsCount');",
+          "                pm.expect(article).to.have.property('createdAt');",
+          "                pm.expect(article).to.have.property('updatedAt');",
+          "            }",
+          "        });",
+          "    } else if (responseData.data && typeof responseData.data === 'object') {",
+          "        pm.test(\"Article uses camelCase properties\", function () {",
+          "            const article = responseData.data;",
+          "            pm.expect(article).to.have.property('publishDate');",
+          "            pm.expect(article).to.have.property('imageUrl');",
+          "            pm.expect(article).to.have.property('viewsCount');",
+          "            pm.expect(article).to.have.property('createdAt');",
+          "            pm.expect(article).to.have.property('updatedAt');",
+          "        });",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}

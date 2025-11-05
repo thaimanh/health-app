@@ -1,7 +1,7 @@
 import app from './app';
 import config from './config';
 import { logger } from './shared/logger';
-import prismaService from './shared/prisma';
+import prismaService from './service/prisma';
 
 const startServer = async () => {
   const PORT = config.get('port');

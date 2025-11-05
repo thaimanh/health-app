@@ -10,16 +10,14 @@ import {
   Authorized,
   CurrentUser,
   HttpCode,
-  OnUndefined,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import userService from './user.service';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { User } from '@prisma/client';
-import { CREATED, OK, Paginated } from '../../../shared/utils/apiResponse';
 
 @Controller('/user')
-@OpenAPI({ security: [{ bearerAuth: [] }] })
+@Authorized()
 export class UserController {
   @Post()
   @HttpCode(201)
@@ -29,36 +27,30 @@ export class UserController {
   })
   async createUser(@Body() userData: CreateUserDto) {
     const newUser = await userService.createUser(userData);
-    CREATED.sendCreated('Create user successfully', newUser);
+    return {
+      data: newUser,
+      message: 'Create user successfully',
+    };
   }
 
   @Get()
-  @OpenAPI({
-    summary: 'Get all users',
-    description: 'Retrieves a paginated list of users with optional filtering',
-  })
+  @Authorized(['ADMIN'])
   async getUsers(
     @QueryParam('page') page: number = 1,
     @QueryParam('limit') limit: number = 10,
     @QueryParam('search') search?: string,
-    @QueryParam('role') role?: string,
   ) {
-    const filters = {
-      page: Math.max(1, page),
-      limit: Math.min(100, limit),
-      search,
-      role,
+    const result = await userService.getUsers({ page, limit, search });
+
+    return {
+      data: result.users,
+      pagination: {
+        total: result.total,
+        page: page,
+        limit: limit,
+      },
+      message: 'Users retrieved successfully',
     };
-
-    const result = await userService.getUsers(filters);
-
-    Paginated.sendPaginated(
-      result.users,
-      result.total,
-      filters.page,
-      filters.limit,
-      'Get list user successfully',
-    );
   }
 
   @Get('/:id')
@@ -68,7 +60,10 @@ export class UserController {
   })
   async getUserById(@Param('id') id: string) {
     const user = await userService.getUserById(id);
-    OK.sendOK('Get detail user successfully', user);
+    return {
+      data: user,
+      message: 'User retrieved successfully',
+    };
   }
 
   @Put('/:id')
@@ -78,18 +73,19 @@ export class UserController {
   })
   async updateUser(@Param('id') id: string, @Body() updateData: UpdateUserDto) {
     const updatedUser = await userService.updateUser(id, updateData);
-    OK.sendOK('Update user successfully', updatedUser);
+    return {
+      data: updatedUser,
+      message: 'User updated successfully',
+    };
   }
 
   @Delete('/:id')
-  @HttpCode(204)
-  @OnUndefined(204)
-  @OpenAPI({
-    summary: 'Delete user',
-    description: 'Deletes a specific user by their ID',
-  })
-  async deleteUser(@Param('id') id: string): Promise<void> {
+  @Authorized(['ADMIN'])
+  async deleteUser(@Param('id') id: string) {
     await userService.deleteUser(id);
+    return {
+      message: 'Delete user successfully',
+    };
   }
 
   @Get('/me/profile')
@@ -101,9 +97,8 @@ export class UserController {
   async getCurrentUser(@CurrentUser() user: User) {
     const userProfile = await userService.getUserById(user.id);
     return {
-      success: true,
-      message: 'Get user profile successfully',
       data: userProfile,
+      message: 'Get user profile successfully',
     };
   }
 
@@ -116,9 +111,8 @@ export class UserController {
   async updateCurrentUser(@CurrentUser() user: User, @Body() updateData: UpdateUserDto) {
     const updatedUser = await userService.updateUser(user.id, updateData);
     return {
-      success: true,
-      message: 'Update user profile successfully',
       data: updatedUser,
+      message: 'Update user profile successfully',
     };
   }
 }

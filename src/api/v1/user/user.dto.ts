@@ -106,6 +106,7 @@ export const detailUserSelect = {
   email: true,
   phone: true,
   role: true,
+  recentDayBodyMeasurements: true,
   updatedAt: true,
   createdAt: true,
 };

@@ -1,6 +1,6 @@
 import { Prisma, UserRole } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import prismaService from '../../../shared/prisma';
+import prismaService from '../../../service/prisma';
 import {
   detailUserSelect,
   listUserSelect,
@@ -69,10 +69,6 @@ export class UserService {
       ];
     }
 
-    if (filters.role) {
-      where.role = filters.role as UserRole;
-    }
-
     const [users, total] = await Promise.all([
       this.userRepository.findMany({
         where,
@@ -94,6 +90,18 @@ export class UserService {
     const user = await this.userRepository.findUnique({
       where: { id },
       select: detailUserSelect,
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    return user;
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await this.userRepository.findUnique({
+      where: { email },
     });
 
     if (!user) {
